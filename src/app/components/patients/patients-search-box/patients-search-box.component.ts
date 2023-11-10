@@ -6,5 +6,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./patients-search-box.component.sass']
 })
 export class PatientsSearchBoxComponent {
+  
+  
+  submit(){
 
+  }
 }

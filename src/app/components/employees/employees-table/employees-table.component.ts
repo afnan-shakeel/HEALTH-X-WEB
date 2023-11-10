@@ -6,5 +6,12 @@ import { Component } from '@angular/core';
   styleUrls: ['./employees-table.component.sass']
 })
 export class EmployeesTableComponent {
+  empList: any[] = []
+  
+  selectedRecord(item: any){
 
+  }
+  paginationMode (mode: string, value: number){
+
+  }
 }

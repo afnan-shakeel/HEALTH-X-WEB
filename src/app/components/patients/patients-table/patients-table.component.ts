@@ -7,4 +7,11 @@ import { Component } from '@angular/core';
 })
 export class PatientsTableComponent {
 
+  empList: any[] = [];
+  setIsBookingOpen(value: boolean){
+
+  }
+  selectRecord(item: any){
+
+  }
 }

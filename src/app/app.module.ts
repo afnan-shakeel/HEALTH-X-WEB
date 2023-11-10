@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginLayoutComponent } from './layouts/login-layout/login-layout.component';
@@ -20,6 +20,8 @@ import { LoginComponent } from './pages/login/login.component';
 import { UserManagementComponent } from './pages/user-management/user-management.component';
 import { EmployeeManagementComponent } from './pages/employee-management/employee-management.component';
 import { PatientManagementComponent } from './pages/patient-management/patient-management.component';
+import { SearchBoxComponent } from './components/ext/search-box/search-box.component';
+import { TableDefaultComponent } from './components/ext/table-default/table-default.component';
 
 @NgModule({
   declarations: [
@@ -40,11 +42,14 @@ import { PatientManagementComponent } from './pages/patient-management/patient-m
     LoginComponent,
     UserManagementComponent,
     EmployeeManagementComponent,
-    PatientManagementComponent
+    PatientManagementComponent,
+    SearchBoxComponent,
+    TableDefaultComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
