@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import axios, { AxiosInstance } from 'axios';
+import { Observable, throwError } from 'rxjs';
+import { retry, catchError } from 'rxjs/operators';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -39,7 +42,10 @@ export class AxiosService {
         return response;
       },
       (error) => {
-        console.error('err', error)
+        if (error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED' || error.code === 'ECONNREFUSED' ||
+          error.code === 'ECONNRESET' || error.code === 'ENOTFOUND') {
+          console.error('(server connection refused):', error.message);
+        }
         if (error.response) {
           console.error('HTTP error status:', error.response.status);
           let message = error.response.data.responseStatus ? error.response.data.responseStatus.message : error.response.statusText
@@ -52,18 +58,25 @@ export class AxiosService {
         return Promise.reject(error);
       }
     );
-
   }
 
   // auth api method
   async getAuth(endpoint: string) {
     const res = await this.authInstance.get(endpoint).catch((err => {
+      if (axios.isCancel(err)) {
+        console.log('Request canceled by user', err.message);
+        // return
+      }
       throw err
     }))
     return res.data
   }
   async postAuth(endpoint: string, data: any, config: any) {
     const res = await this.authInstance.post(endpoint, data, config).catch((err => {
+      if (axios.isCancel(err)) {
+        console.log('Request canceled by user', err.message);
+        // return
+      }
       throw err
     }))
     return res.data
@@ -72,38 +85,60 @@ export class AxiosService {
   // 
   async getData(endpoint: string) {
     try {
-      const response = await this.axiosInstance.get(endpoint);
+      const response = await this.axiosInstance.get(endpoint, { cancelToken: this.cancelTokenSource.token });
       return response.data;
     } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log('Request canceled by user', error.message);
+        return
+      }
       throw error;
     }
   }
 
   async postData(endpoint: string, data: any, config: any = null) {
     try {
-      const response = await this.axiosInstance.post(endpoint, data, config);
+      const response = await this.axiosInstance.post(endpoint, data, { ...config, cancelToken: this.cancelTokenSource.token });
       return response.data;
     } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log('Request canceled by user', error.message);
+        return
+      }
       throw error;
     }
   }
 
   async putData(endpoint: string, data: any, config: any = null) {
     try {
-      const response = await this.axiosInstance.put(endpoint, data);
+      const response = await this.axiosInstance.put(endpoint, data, { ...config, cancelToken: this.cancelTokenSource.token });
       return response.data;
     } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log('Request canceled by user', error.message);
+        return
+      }
       throw error;
     }
   }
 
   async deleteData(endpoint: string, data: any, config: any = null) {
     try {
-      const response = await this.axiosInstance.delete(endpoint, data);
+      const response = await this.axiosInstance.delete(endpoint, { data: data, ...config, cancelToken: this.cancelTokenSource.token });
       return response.data;
     } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log('Request canceled by user', error.message);
+        return
+      }
       throw error
     }
   }
 
+  private cancelTokenSource = axios.CancelToken.source();
+  cancelRequest() {
+    this.cancelTokenSource.cancel('Operation canceled by the user.');
+    //  new CancelToken - one time use
+    this.cancelTokenSource = axios.CancelToken.source();
+  }
 }

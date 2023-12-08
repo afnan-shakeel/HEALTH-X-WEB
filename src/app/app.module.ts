@@ -23,6 +23,8 @@ import { PatientManagementComponent } from './pages/patient-management/patient-m
 import { SearchBoxComponent } from './components/ext/search-box/search-box.component';
 import { TableDefaultComponent } from './components/ext/table-default/table-default.component';
 
+import { NumberInputDirective } from './directives/number-input.directive';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -44,7 +46,10 @@ import { TableDefaultComponent } from './components/ext/table-default/table-defa
     EmployeeManagementComponent,
     PatientManagementComponent,
     SearchBoxComponent,
-    TableDefaultComponent
+    TableDefaultComponent,
+
+
+    NumberInputDirective
   ],
   imports: [
     BrowserModule,
