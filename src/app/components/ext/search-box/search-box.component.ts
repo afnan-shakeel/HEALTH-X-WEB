@@ -26,24 +26,17 @@ export class SearchBoxComponent {
   }
   submit() {
     console.log(this.form.value)
-    this.form.valueChanges.pipe(
-      map(values => {
-        // Transform the values here
-        console.log("value change pipe");
-        const transformedValues: any = {};
-        for (const key in values) {
-          if (typeof values[key] === 'string') {
-            transformedValues[key] = values[key].trim();
-          } else {
-            transformedValues[key] = values[key];
-          }
-        }
-        return transformedValues;
-      })
-    ).subscribe(transformedValues => {
-      console.log(transformedValues);
-      this.eventEmitter.emit({ name: this.eventId, data: transformedValues });
-    });
+
+    var values = this.form.value;
+    const transformedValues: any = {};
+    for (const key in values) {
+      if (typeof values[key] === 'string') {
+        transformedValues[key] = values[key].trim();
+      } else {
+        transformedValues[key] = values[key];
+      }
+    }
+    this.eventEmitter.emit({ name: this.eventId, data: transformedValues });
 
     // Trigger the valueChanges observable by calling updateValueAndValidity
     this.form.updateValueAndValidity();

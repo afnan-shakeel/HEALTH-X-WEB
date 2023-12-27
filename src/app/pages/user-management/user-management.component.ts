@@ -140,7 +140,6 @@ export class UserManagementComponent {
     },
   ]
   searchEventId: string = "user-search-event";
-  tableEventId: string = "user-table-event";
   userList: any[] = [];
   perPage: number = 10;
   cursorId: string = "1";
@@ -148,10 +147,9 @@ export class UserManagementComponent {
   searchCriteria: any[] = [];
   pagination: any;
   _pagination: any;
-  tableHeaders: any[] = [{ name: "ID", key: "id" }, { name: "User Name", key: "username" }, { name: "Email", key: "email" }, { name: "Mobile", key: "mobile" },
-  { name: "Status", key: "status" }, { name: "Created At", key: "createdAt" }, { name: "Updated At", key: "updatedAt" }]
-
-  constructor(private axiosService: AxiosService, private sharedService: SharedDataService) { }
+  isFormOpen: boolean = false;
+ 
+  constructor(private axiosService: AxiosService ) { }
 
 
   handleUserSearchEvent(event: any) {
@@ -163,8 +161,14 @@ export class UserManagementComponent {
           continue
         }
         else {
-          if(["mobile","id"].includes(key)){
+          if (["mobile", "id"].includes(key)) {
             this.searchCriteria.push({ "key": key, "type": "3", "value": Number(event.data[key]) })
+            continue
+          }
+          if(["FromDate","ToDate"].includes(key)){
+          }
+          if(["status"].includes(key)){
+            this.searchCriteria.push({ "key": key, "type": "2", "value": event.data[key] })
             continue
           }
           this.searchCriteria.push({ "key": key, "type": "1", "value": event.data[key] })
@@ -177,26 +181,25 @@ export class UserManagementComponent {
     }
   }
   handleUserTableEvent(event: any) {
-    if (event.name == 'user-table-event') {
-      var obj: any = {};
-      if (event.data.mode == 'page') {
-        this.pageId = event.data.value
-        obj = this.userPayload('page', event.data.value - 1, this.perPage, this.searchCriteria)
-      }
-      else if (event.data.mode == 'cursor') {
-        this.cursorId = event.data.value
-        obj = this.userPayload('cursor', event.data.value, this.perPage, this.searchCriteria)
-      }
-      console.log(this.searchCriteria)
-      console.log(obj)
-      this.fetchUser(obj)
+    var obj: any = {};
+    if (event.data.mode == 'page') {
+      this.pageId = event.data.value
+      obj = this.userPayload('page', event.data.value - 1, this.perPage, this.searchCriteria)
     }
+    else if (event.data.mode == 'cursor') {
+      this.cursorId = event.data.value
+      obj = this.userPayload('cursor', event.data.value, this.perPage, this.searchCriteria)
+    }
+    console.log(this.searchCriteria)
+    console.log(obj)
+    this.fetchUser(obj)
   }
 
   rangeList = (num: number) => Array.from({ length: num }, (_, i) => i + 1);
+
   async fetchUser(payload: any = null) {
     const res = await this.axiosService.postData('/user', payload)
-    this.userList = res.data.users || []
+    this.userList = res.data.data || []
     this.pagination = res.data.meta || []
 
     this._pagination = {
@@ -234,33 +237,24 @@ export class UserManagementComponent {
     this.fetchUser(obj)
   }
 
+  editData: any;
+  handleUserEdit(event: any) {
+    console.log('edit',event.data)
+    this.editData = event.data
+    this.setFormOpen(true)
 
-
-
-
-
-
-  openForm() {
-    const $modalElement: HTMLElement = document.querySelector('#modalEl')!;
-
-    const modalOptions: ModalOptions = {
-      placement: 'center',
-      backdrop: 'dynamic',
-      backdropClasses: 'bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40',
-      closable: true,
-      onHide: () => {
-        console.log('modal is hidden');
-      },
-      onShow: () => {
-        console.log('modal is shown');
-      },
-      onToggle: () => {
-        console.log('modal has been toggled');
-      }
-    }
-
-    const modal: ModalInterface = new Modal($modalElement, modalOptions);
-
-    modal.show();
   }
+
+  formModal: any;
+  async setFormOpen(value: boolean) {
+    this.isFormOpen = value;
+  }
+  closeForm() {
+    this.setFormOpen(false)
+  }
+
+  ngOnInit(): void {
+    this.fetchUser(this.userPayload('page', 0, this.perPage, []))
+  }
+
 }

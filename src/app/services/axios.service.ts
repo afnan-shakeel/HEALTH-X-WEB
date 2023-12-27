@@ -71,7 +71,7 @@ export class AxiosService {
     }))
     return res.data
   }
-  async postAuth(endpoint: string, data: any, config: any) {
+  async postAuth(endpoint: string, data: any, config: any = null) {
     const res = await this.authInstance.post(endpoint, data, config).catch((err => {
       if (axios.isCancel(err)) {
         console.log('Request canceled by user', err.message);
