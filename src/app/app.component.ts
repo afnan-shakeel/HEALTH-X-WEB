@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { initFlowbite } from 'flowbite';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.sass']
 })
 export class AppComponent {
-  title = 'HEALTH-X-NG16-WEB';
+  title = 'HEALTH-X-WEB';
+
+  ngOnInit(): void {
+    initFlowbite();
+  }
 }
