@@ -30,13 +30,7 @@ export class UserTableComponent {
     { value: 'suspended', name: 'Suspended' },
     { value: 'closed', name: 'Closed' },
   ]
-  async fetchUser(searchArr: any[] | null = null) {
-    // let searchArr: any[] = []
-    var obj = this.paginationPayload('page', 1, searchArr)
-    const res = await this.axiosService.postData('/user', obj)
-    this.userList = res.data.users || []
-    console.log(this.userList)
-  }
+
 
   editRecord(data: any) {
     this.userEditEvent.emit({ data: data })
@@ -51,6 +45,7 @@ export class UserTableComponent {
     confirmText: "Update"
   }
   handleStatusSelectEvent(event: any, item: any) {
+    console.log('x -> handleStatusSelectEvent', event)
     this.setWarningDialog()
     this.warningDialogData.data = item
     this.warningDialogData.message = `Are you sure you want to update ${item.username}'s status?`
@@ -62,22 +57,13 @@ export class UserTableComponent {
   }
   updateUserStatus(event: any){
     console.log('to update user status. coming soon!', event)
-    window.alert(`in development - ${event?.username}` )
+    window.alert(`..Still in development :(  [${event?.username}]` )
     this.setWarningDialog()
     // this.fetchUser()
   }
   
 
-  paginationPayload(mode: string, value: number, searchArr: any[] | null) {
-    return {
-      "pageId": (mode == "page") && this.page_id,
-      "cursorId": (mode == "cursor") && this.cursor_id,
-      "pageLimit": value,
-      "sortField": null,
-      "sortType": null,
-      "searchQuery": searchArr
-    }
-  }
+
 
   paginationMode(mode: String, value: any) {
     this.userPaginationEvent.emit({ data: { mode: mode, value: value } })
