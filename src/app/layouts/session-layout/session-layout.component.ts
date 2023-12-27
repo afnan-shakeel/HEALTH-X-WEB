@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Dropdown } from "flowbite";
 import type { DropdownOptions, DropdownInterface } from "flowbite";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-session-layout',
@@ -11,7 +12,9 @@ export class SessionLayoutComponent {
 
   settingsMenu: boolean = false;
   mobileMenu: boolean = false;
+  profileMenuOpen: boolean = false;
   pageHeader: string = '';
+  constructor(private router: Router) { }
   menusList = [
     {
       id: 1,
@@ -24,7 +27,6 @@ export class SessionLayoutComponent {
       id: 3,
       title: "User",
       isActive: false,
-      to: "/user",
       subMenu: [
         { id: 1, title: "User Management", to: "/user" }
       ]
@@ -65,41 +67,28 @@ export class SessionLayoutComponent {
  
     },
   ]
-  subMenuDropdown(item: any) {
-    const $targetEl = document.getElementById(item.id);
-    const $triggerEl = document.getElementById(item.id);
-    console.log($targetEl?.id)
-    // options with default values
-    const options: DropdownOptions = {
-      placement: 'bottom',
-      triggerType: 'click',
-      // offsetSkidding: 0,
-      // offsetDistance: 10,
-      delay: 300,
-      onHide: () => {
-        console.log('dropdown has been hidden');
-      },
-      onShow: () => {
-        console.log('dropdown has been shown');
-      },
-      onToggle: () => {
-        console.log('dropdown has been toggled');
-      }
-    };
-    const dropdown: DropdownInterface = new Dropdown($targetEl, $triggerEl, options);
 
-    // show the dropdown
-    dropdown.show();
-
-  }
-  routeTo(index: number, to: any, item: any) {
-
-  }
-  toggleDarkMode() {
-
+  routeTo(to: string, item: any) {
+    console.log(to, item)
+    this.router.navigateByUrl(to);
+    item.isActive = false;
   }
 
+  toggleMenuDropdown(value: boolean,item: any) {
+    this.menusList.forEach((element: any) => {
+      element.isActive = false;
+    });
+
+    item.isActive = value;
+  }
+  
   _signOut() {
+    window.localStorage.clear();
+    window.sessionStorage.clear();
+    // this.router.navigate(['/login']);
+  }
 
+  setProfileMenu(value: boolean) {
+    this.profileMenuOpen = value;
   }
 }
