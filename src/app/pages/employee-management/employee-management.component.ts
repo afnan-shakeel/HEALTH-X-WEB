@@ -110,9 +110,10 @@ export class EmployeeManagementComponent {
     { name: 'Action', key: 'action', colspan: '', type: 'action', options: [{ name: "Edit", value: "edit" }, { name: "Delete", value: "delete" }] },
   ];
   empList: any[] = [];
-  page_limit: number = 10;
-  cursor_id: string = "1";
-  page_id: number = 1;
+  perPage: number = 10;
+  cursorId: string = "1";
+  pageId: number = 0;
+  searchCriteria: any[] = [];
   pagination: any;
   _pagination: any;
   tableHeaders: any[] = [{ name: "ID", key: "id" }, { name: "Employee Name", key: "username" }, { name: "Email", key: "email" }, { name: "Mobile", key: "mobile" },
@@ -121,40 +122,72 @@ export class EmployeeManagementComponent {
   ngOnInit(): void {
   }
   rangeList = (num: number) => Array.from({ length: num }, (_, i) => i + 1);
-  async fetchUser(searchArr: any[] | null = null) {
-    // let searchArr: any[] = []
-    var obj = this.userPayload('page', 1, searchArr)
-    const res = await this.axiosService.postData('/user', obj)
-    this.empList = res.data.users || []
+
+  async fetchEmp(payload: any = null) {
+    const res = await this.axiosService.postData('/employee', payload)
+    this.empList = res.data.data || []
     this.pagination = res.data.meta || []
 
     this._pagination = {
-      totalRecords: this.empList.length,
-      totalPages: this.rangeList(Math.ceil(this.empList.length / 10)),
+      totalRecords: this.pagination.total_record,
+      totalPages: this.rangeList(Math.ceil(this.pagination.total_record / this.perPage)),
       currentPage: this.pagination.page.current_page,
-      perPage: 10,
+      perPage: this.perPage,
       mode: 'default'
     }
     console.log(this.empList)
   }
 
-  userPayload(pageMode: string, paginationValue: number, searchArr: any[] | null) {
+  userPayload(pageMode: string, paginationValue: string | number, perPage: number, searchArr: any[] | null) {
     return {
-      "pageId": (pageMode == "page") && this.page_id,
-      "cursorId": (pageMode == "cursor") && this.cursor_id,
-      "pageLimit": paginationValue,
+      "pageId": (pageMode == "page") && Number(paginationValue),
+      "cursorId": (pageMode == "cursor") && paginationValue,
+      "pageLimit": perPage,
       "sortField": null,
       "sortType": null,
       "searchQuery": searchArr
     }
   }
-  handleUserEvent(event: any) {
-    console.log('event x')
-    if (event.name == 'employee-event') {
-      console.log('emlpoyee recieved', event)
-      this.fetchUser()
+
+  handleUserSearchEvent(event: any) {
+    this.searchCriteria = []
+    if (event.name == 'user-search-event') {
+      var obj;
+      for (let key of Object.keys(event.data)) {
+        if (event.data[key] == null || event.data[key] == "") {
+          continue
+        }
+        else {
+          if(["mobile","id"].includes(key)){
+            this.searchCriteria.push({ "key": key, "type": "3", "value": Number(event.data[key]) })
+            continue
+          }
+          this.searchCriteria.push({ "key": key, "type": "1", "value": event.data[key] })
+        }
+      }
+      console.log(this.searchCriteria)
+      obj = this.userPayload('page', this.pageId, this.perPage, this.searchCriteria)
+      console.log(obj)
+      this.fetchEmp(obj)
     }
   }
+  handleUserTableEvent(event: any) {
+    if (event.name == 'user-table-event') {
+      var obj: any = {};
+      if (event.data.mode == 'page') {
+        this.pageId = event.data.value
+        obj = this.userPayload('page', event.data.value - 1, this.perPage, this.searchCriteria)
+      }
+      else if (event.data.mode == 'cursor') {
+        this.cursorId = event.data.value
+        obj = this.userPayload('cursor', event.data.value, this.perPage, this.searchCriteria)
+      }
+      console.log(this.searchCriteria)
+      console.log(obj)
+      this.fetchEmp(obj)
+    }
+  }
+
   openForm() {
     const $modalElement: HTMLElement = document.querySelector('#modalEl')!;
 
