@@ -22,8 +22,10 @@ import { EmployeeManagementComponent } from './pages/employee-management/employe
 import { PatientManagementComponent } from './pages/patient-management/patient-management.component';
 import { SearchBoxComponent } from './components/ext/search-box/search-box.component';
 import { TableDefaultComponent } from './components/ext/table-default/table-default.component';
-
 import { NumberInputDirective } from './directives/number-input.directive';
+import { UserRoleFormComponent } from './components/role/user-role-form/user-role-form.component';
+import { SelectBoxComponent } from './components/ext/select-box/select-box.component';
+import { WarningDialogComponent } from './components/ext/warning-dialog/warning-dialog.component';
 
 @NgModule({
   declarations: [
@@ -47,14 +49,15 @@ import { NumberInputDirective } from './directives/number-input.directive';
     PatientManagementComponent,
     SearchBoxComponent,
     TableDefaultComponent,
-
-
-    NumberInputDirective
+    UserRoleFormComponent,
+    NumberInputDirective,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    SelectBoxComponent,
+    WarningDialogComponent
   ],
   providers: [],
   bootstrap: [AppComponent]
